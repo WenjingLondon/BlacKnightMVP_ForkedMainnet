@@ -1,0 +1,58 @@
+/* Features Background */
+.features-hero {
+  background-image: url('luxury_background.jpg'); 
+  background-size: cover;
+  background-position: center;
+  padding: 120px 0; 
+}
+
+.screens-container {
+  display: flex;              
+  justify-content: center;    
+  gap: 40px;                  
+  padding: 60px 0;            
+  flex-wrap: nowrap;          
+}
+
+/* 每一块屏幕样式 */
+.feature-screen {
+  height: 100vh;
+  margin: 40px auto;
+  width: 25%;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;   
+}
+
+.screen1 {
+  background-color: rgba(54, 162, 235, 0.85); 
+}
+
+.screen2 {
+  background-color: rgba(54, 162, 235, 0.85); 
+}
+
+.screen3 {
+  background-color: rgba(54, 162, 235, 0.85); 
+}
+
+.screen-content {
+  color: white;
+  text-align: center;
+  max-width: 700px;
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+}
+
+.screen-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.screen-content p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YieldNest</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+<!-- 固定导航栏 -->
+<header class="navbar">
+    <div class="container">
+        <div class="navbar-logo">
+      <img src="logo.png" alt="Project Logo" class="logo">
+      <span class="project-name">BlacKnight</span>
+      </div>
+        <h1 class="logo">YieldNest</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="about.html">About</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="ecopage.html">Eco Assets</a></li>
+                <li><a href="female.html">Athena</a></li>
+                <li><a href="subscribe.html">Subscribe</a></li>
+            </ul>
+        </nav>
+           <button id="connectWallet" class="connect-wallet-btn">Connect Wallet</button>
+           <p id="walletAddress" style="font-weight: bold;"></p>
+           <p id="statusMessage" style="color: green;"></p>
+    </div>
+</header>
+
+<!-- Section 1: 固定粉色背景 -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to BlacKnight</h1>
+        <p>The Easiest Way to Invest In Crypto Passively</p>
+        <div class="cta-buttons">
+    <button id="startInvestingBtn" class="btn">Start Investing</button>
+
+        </div>
+    </div>
+</section>
+
+<h2>AAVE Real-Time Market Data</h2>
+<p id="dataTimestamp" style="font-style: italic; margin: 10px 0;"></p>
+<table id="aave-table" border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Asset</th>
+      <th>Supply APY (%)</th>
+      <th>Borrow APY (%)</th>
+      <th>LTV (%)</th>
+      <th>Liquidation Threshold (%)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div style="margin-top: 20px;">
+    <button id="recommendBtn" style="
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  ">Get AI Recommendation</button>
+  <pre id="result" style="margin-top: 10px; background: #f9f9f9; padding: 10px;"></pre>
+</div>
+
+
+<!-- 渐进式出现的 Screens -->
+<section class="screens">
+    <div class="screen" id="screen1">
+        <img src="screen1.jpg" alt="screen 1" />
+    </div>
+    <div class="screen" id="screen2">
+        <img src="screen2.jpg" alt="screen 2" />
+    </div>
+    <div class="screen" id="screen3">
+        <img src="screen3.jpg" alt="screen 3" />
+    </div>
+</section>
+
+<!-- Section 2: 全屏背景图 -->
+<section class="section-overlay">
+    <div class="overlay-content">
+         <h2 style="background-color: rgba(0, 0, 0, 0.5); color: white; padding: 30px; border-radius: 5px;">Discover the Next Level of DeFi</h2>
+    </div>
+</section>
+
+<!-- 第三个 section -->
+<section id="features" class="section features" style="background-color: lightblue !important;">
+  <div class="container">
+      <h3>Features</h3>
+      <ul>
+          <li>📊 Auto-yield strategies</li>
+          <li>🔒 Transparent DeFi protocols</li>
+          <li>🧘 Relaxed, user-focused UI</li>
+      </ul>
+  </div>
+</section>
+
+<!-- 更多内容 -->
+<section id="benefits" class="section why" style="background-color: #FFFFE0 !important;">
+  <div class="container">
+      <h3>Why Choose Us?</h3>
+      <p>We believe DeFi should be accessible, chic, and empowering. Our platform is designed to welcome everyone into crypto investing.</p>
+  </div>
+</section>
+
+<!-- 最后一个 section -->
+<section id="join" class="section join" style="background-color: pink !important;">
+  <div class="container">
+      <h3>Get Early Access</h3>
+      <p>Join our waitlist and be the first to experience simplified yield generation.</p>
+      <form class="signup-form">
+          <input type="email" placeholder="Your email" required />
+          <button type="submit">Join Waitlist</button>
+      </form>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 BlacKnight. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+
+let connectedWallet = null;
+
+document.getElementById("connectWallet").addEventListener("click", async () => {
+    console.log("Button clicked");
+
+    if (typeof window.ethereum === 'undefined') {
+        alert("Please install MetaMask or another wallet plugin.");
+        console.log("MetaMask is not installed.");
+        return;
+    }
+    
+    console.log("MetaMask detected");
+
+    try {
+        // 请求连接钱包
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // 获取当前用户的钱包地址
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        
+        if (accounts.length === 0) {
+            alert("No accounts found. Please check your MetaMask.");
+            return;
+        }
+
+        connectedWallet = accounts[0];  // 使用全局变量保存钱包地址
+        
+        console.log("Connected Wallet: " + connectedWallet);
+        
+        // 更新UI
+        document.getElementById("walletAddress").textContent = "Connected Wallet: " + connectedWallet;
+
+        document.getElementById("connectWallet").textContent = "Wallet Connected";
+        document.getElementById("statusMessage").textContent = "✅ Wallet connected. You can now start investing!"; 
+        document.getElementById("connectWallet").disabled = true;  // 禁用按钮
+
+    } catch (err) {
+        console.error("Connection Error: ", err);
+        alert("Failed to connect wallet. Please try again.");
+    }
+});
+
+      document.getElementById("startInvestingBtn").addEventListener("click", () => {
+    if (!connectedWallet) {
+        alert("⚠️ Please connect your wallet before investing.");
+        return;
+    }
+
+    // 跳转到 invest.html
+    window.location.href = "invest.html";
+});
+    </script>
+
+      <script type="module">
+
+  import { getAaveMarketData } from './aaveDataService.js';
+
+  async function renderTable() {
+    const data = await getAaveMarketData();
+
+    const tbody = document.querySelector("#aave-table tbody");
+    tbody.innerHTML = "";
+
+    data.forEach((item) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.asset}</td>
+        <td>${item.supplyAPY.toFixed(2)}</td>
+        <td>${item.borrowAPY.toFixed(2)}</td>
+        <td>${item.ltv.toFixed(0)}</td>
+        <td>${item.liquidationThreshold.toFixed(0)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+    const timestamp = new Date().toLocaleString(); // 本地时间格式
+    document.getElementById("dataTimestamp").textContent = `Last updated: ${timestamp}`;
+  }
+
+  renderTable().catch(console.error);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subscribe - BlackKnight</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('luxury_background.jpg'); 
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .subscribe-box {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    input[type="email"] {
+      padding: 10px;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #00BFFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff1493;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Fixed navigation bar -->
+  <header class="navbar">
+    <div class="container">
+      <div class="navbar-logo">
+        <img src="logo.png" alt="Project Logo" class="logo">
+        <span class="project-name">BlacKnight</span>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="ecopage.html">Eco Assets</a></li>  
+        <li><a href="female.html">Athena</a></li>
+        <li><a href="subscribe.html">Subscribe</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="subscribe-box">
+    <h1>Subscribe to Updates</h1>
+    <form id="subscribe-form">
+      <input type="email" placeholder="Enter your email" required />
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    // 当前仅前端交互演示，不实际发送邮件
+    document.getElementById('subscribe-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("Thank you for subscribing!");
+    });
+  </script>
+</body>
+</html>
+

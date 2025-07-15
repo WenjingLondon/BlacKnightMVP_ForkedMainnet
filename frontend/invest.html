@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invest & Redeem - Auto Yield</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="invest.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: #f9f9f9;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h2 {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .token-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .token-list li {
+      padding: 10px;
+      margin-bottom: 8px;
+      background-color: #444;
+      color: #00ffcc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .token-list li:hover {
+      background-color: #555;
+    }
+
+    .token-list li.disabled {
+      color: gray;
+      cursor: not-allowed;
+      background-color: #2a2a2a;
+    }
+
+    .sidebar a {
+      display: block;
+      margin-top: 40px;
+      color: #99ff99;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .container {
+      flex: 1;
+      padding: 40px 60px;
+      position: relative;
+    }
+
+    h1 {
+      color: #2e7d32;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 12px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #276428;
+    }
+
+    button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+
+    h3 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    #investmentBalance {
+      background-color: #d0f0d0;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 左边导航栏 -->
+<aside class="sidebar">
+  <h2>Token List</h2>
+  <ul class="token-list">
+    <li onclick="selectToken('DAI')">DAI</li>
+    <li onclick="selectToken('USDC')">USDC</li>
+  </ul>
+  <a href="index.html">← Back to Home</a>
+</aside>
+
+<!-- 主内容 -->
+<div class="container">
+  <h1>Auto Yield Investment</h1>
+  <p id="walletAddress"></p>
+
+  <div>
+    <h3>Invest</h3>
+    <input type="text" id="tokenAddress" placeholder="Token Contract Address (auto-filled)" />
+    <input type="number" id="amount" placeholder="Amount to Invest" />
+    <button id="investBtn">Invest</button>
+  </div>
+
+  <div>
+    <h3>Redeem</h3>
+    <input type="text" id="redeemTokenAddress" placeholder="Token Contract Address" />
+    <input type="number" id="redeemAmount" placeholder="Amount to Redeem" />
+    <button id="redeemBtn">Redeem</button>
+  </div>
+
+  <div style="margin-top: 40px; max-width: 400px;">
+    <h3>Check Your Investment</h3>
+    <button id="checkBalanceBtn">Check Investment Balance</button>
+    <p id="investmentBalance"></p>
+    <p id="investedAmountDisplay" style="margin-top: 10px; color: #444;"></p>
+    <p id="redeemSuggestion" style="margin-top: 5px; font-style: italic; color: #777;"></p>
+   <button onclick="autofillRedeemAmount()">Auto-Fill Redeem Amount</button>
+  </div>
+<p>
+  <button onclick="checkStrategy()" style="padding:4px 10px; font-size:13px; background:#a8d5a2; color:#000; border:none; border-radius:4px; cursor:pointer; display:inline-block; width:auto;">Check Token Strategy</button>
+</p>
+<p id="status" style="
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff8c9e; 
+  padding: 6px 14px;
+  font-size: 16px;
+  color: black; 
+  text-align: center;
+  border: none;
+  border-radius: 6px;
+  z-index: 999;
+  max-width: 90%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+">
+</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script>
+  const AGGREGATOR_ADDRESS = "0xF0F53654c24ae511099D032020975C4baa273d12";
+  const AGGREGATOR_ABI = [
+    "function deposit(address token, uint256 amount) external",
+    "function withdraw(address token, uint256 amount) external"
+  ];
+
+  const tokenAddresses = {
+    DAI: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  };
+
+  const strategyNames = {
+  "0xAB386e04A54AF65993e1cD00977E122eF9F332E2": "AaveStrategy",
+  "0xAC199d7CFf037468FCCBf17BbD3bb2dddFD92590": "SimpleStrategy"
+};
+
+  let provider, signer, aggregatorContract;
+
+  const STRATEGY_FACTORY_ADDRESS = "0xC590836DeFBc8Ed2B0D4481da40D305A5b38de6C";
+  const STRATEGY_FACTORY_ABI = [
+  "function getBestStrategy(address token) external view returns (address)"
+];
+
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)"
+];
+
+  function saveInvestedAmount(token, amount) {
+  const data = JSON.parse(localStorage.getItem('investments') || '{}');
+  data[token] = (data[token] ? parseFloat(data[token]) : 0) + parseFloat(amount);
+  localStorage.setItem('investments', JSON.stringify(data));
+}
+
+function getInvestedAmount(token) {
+  const data = JSON.parse(localStorage.getItem('investments') || '{}');
+  return data[token] || 0;
+}
+
+async function checkStrategy() {
+  const token = document.getElementById("tokenAddress").value.trim();
+  if (!token) return updateStatus("Token address required.");
+
+  const strategyFactory = new ethers.Contract(
+    STRATEGY_FACTORY_ADDRESS,
+    STRATEGY_FACTORY_ABI,
+    provider
+  );
+
+  const strategyAddress = await strategyFactory.getBestStrategy(token);
+  const name = strategyNames[strategyAddress] || strategyAddress;
+
+  updateStatus(`💡 Best strategy for this token is: ${name}`);
+}
+
+  function selectToken(symbol) {
+    const address = tokenAddresses[symbol];
+    if (address) {
+      document.getElementById("tokenAddress").value = address;
+      document.getElementById("redeemTokenAddress").value = address;  
+    }
+  }
+
+  async function init() {
+    if (!window.ethereum) {
+      updateStatus("Please install MetaMask.");
+      return;
+    }
+
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    try {
+      await provider.send("eth_requestAccounts", []);
+    } catch {
+      updateStatus("Wallet connection rejected.");
+      return;
+    }
+
+    signer = provider.getSigner();
+    aggregatorContract = new ethers.Contract(AGGREGATOR_ADDRESS, AGGREGATOR_ABI, signer);
+
+    document.getElementById("investBtn").addEventListener("click", invest);
+    document.getElementById("redeemBtn").addEventListener("click", redeem);
+
+    document.getElementById("checkBalanceBtn").addEventListener("click", async () => {
+    await checkBalance();
+    await updateInvestmentInfo();
+    });
+
+    updateStatus("Wallet connected: " + await signer.getAddress());
+  }
+
+  function updateStatus(msg) {
+    const status = document.getElementById("status");
+    status.innerText = msg;
+    console.log(msg);
+  }
+
+  // 统一用 investments 对象存储所有token投资数据
+function saveInvestedAmount(token, amount) {
+  const data = JSON.parse(localStorage.getItem('investments') || '{}');
+  data[token] = (data[token] ? parseFloat(data[token]) : 0) + parseFloat(amount);
+  localStorage.setItem('investments', JSON.stringify(data));
+}
+
+function getInvestedAmount(token) {
+  const data = JSON.parse(localStorage.getItem('investments') || '{}');
+  return data[token] || 0;
+}
+
+function reduceInvestedAmount(token, amount) {
+  const data = JSON.parse(localStorage.getItem('investments') || '{}');
+  data[token] = Math.max(0, (data[token] ? parseFloat(data[token]) : 0) - parseFloat(amount));
+  localStorage.setItem('investments', JSON.stringify(data));
+}
+
+async function invest() {
+  const token = document.getElementById("tokenAddress").value.trim();
+  const amount = document.getElementById("amount").value.trim();
+
+  if (!token || !amount || isNaN(amount) || amount <= 0) {
+    updateStatus("Please enter a valid token address and amount.");
+    return;
+  }
+
+  try {
+    updateStatus(`Approving token spend...`);
+
+    const ERC20_ABI = [
+      "function approve(address spender, uint256 amount) external returns (bool)",
+      "function decimals() view returns (uint8)"
+    ];
+
+    const tokenContract = new ethers.Contract(token, ERC20_ABI, signer);
+    const tokenDecimals = await tokenContract.decimals();
+    const parsedAmount = ethers.utils.parseUnits(amount, tokenDecimals);
+
+    const approveTx = await tokenContract.approve(AGGREGATOR_ADDRESS, parsedAmount);
+    await approveTx.wait();
+
+    updateStatus(`Approved successfully. Submitting deposit of ${amount} tokens...`);
+
+    const tx = await aggregatorContract.deposit(token, parsedAmount);
+    updateStatus("Transaction sent, waiting for confirmation...");
+    await tx.wait();
+
+    saveInvestedAmount(token, amount);
+    updateStatus(`✅ Investment successful! Amount: ${amount}`);
+
+    console.log("Invest tx:", tx);
+  } catch (err) {
+    updateStatus("❌ Investment failed, see console.");
+    console.error(err);
+  }
+}
+
+async function redeem() {
+  const token = document.getElementById("redeemTokenAddress").value.trim();
+  const amount = document.getElementById("redeemAmount").value.trim();
+
+  if (!token || !amount || isNaN(amount) || amount <= 0) {
+    updateStatus("Please enter a valid token address and amount.");
+    return;
+  }
+
+  try {
+    const ERC20_ABI = ["function decimals() view returns (uint8)"];
+    const tokenContract = new ethers.Contract(token, ERC20_ABI, provider);
+    const decimals = await tokenContract.decimals();
+    const parsedAmount = ethers.utils.parseUnits(amount, decimals);
+
+    const investedAmount = getInvestedAmount(token);
+    if (parseFloat(amount) > investedAmount) {
+      updateStatus(`❌ You can only redeem up to ${investedAmount} tokens.`);
+      return;
+    }
+
+    updateStatus(`Submitting redeem: ${amount} tokens from contract...`);
+
+    const tx = await aggregatorContract.withdraw(token, parsedAmount);
+    updateStatus("Transaction sent, waiting for confirmation...");
+    await tx.wait();
+
+    reduceInvestedAmount(token, amount);
+    updateStatus(`✅ Redemption successful! Amount: ${amount}`);
+    console.log("Redeem tx:", tx);
+  } catch (err) {
+    updateStatus("❌ Redemption failed, see console.");
+    console.error(err);
+  }
+}
+
+
+  async function checkBalance() {
+    try {
+      const userAddress = await signer.getAddress();
+      const tokenAddress = document.getElementById("tokenAddress").value.trim();
+
+      if (!tokenAddress) {
+        document.getElementById("investmentBalance").innerText = "Please input a token address first.";
+        return;
+      }
+      const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+
+
+      const knownDecimals = {
+  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": 6,
+  "0x6B175474E89094C44Da98b954EedeAC495271d0F": 18
+};
+
+let decimals;
+if (tokenAddress in knownDecimals) {
+  decimals = knownDecimals[tokenAddress];
+} else {
+  decimals = await tokenContract.decimals();
+}
+
+const balance = await tokenContract.balanceOf(userAddress);
+const formatted = ethers.utils.formatUnits(balance, decimals);
+
+
+      document.getElementById("investmentBalance").innerText = `📊 Your current token balance: ${formatted}`;
+      updateStatus("Checked balance successfully.");
+    } catch (err) {
+      updateStatus("Failed to fetch balance, see console.");
+      console.error(err);
+          }
+  }
+
+  async function updateInvestmentInfo() {
+  const token = document.getElementById("tokenAddress").value.trim();
+  if (!token) return;
+
+  const invested = getInvestedAmount(token);
+  document.getElementById("investedAmountDisplay").innerText = `💼 Invested amount (local record): ${invested}`;
+
+  // 真实可用余额
+  const userAddress = await signer.getAddress();
+  const tokenContract = new ethers.Contract(token, ERC20_ABI, provider);
+
+const knownDecimals = {
+  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": 6,
+  "0x6B175474E89094C44Da98b954EedeAC495271d0F": 18
+};
+
+let decimals;
+if (token in knownDecimals) {
+  decimals = knownDecimals[token];
+} else {
+  decimals = await tokenContract.decimals();
+}
+
+const balance = await tokenContract.balanceOf(userAddress);
+const formatted = ethers.utils.formatUnits(balance, decimals);
+
+document.getElementById("redeemSuggestion").innerText =
+  `🔑 Current wallet token balance: ${formatted} (can redeem up to this)`;
+
+}
+
+  async function autofillRedeemAmount() {
+  const token = document.getElementById("tokenAddress").value.trim();
+  if (!token) return;
+
+  const invested = getInvestedAmount(token);
+
+  // 获取钱包余额
+  const userAddress = await signer.getAddress();
+  const tokenContract = new ethers.Contract(token, ERC20_ABI, provider);
+
+const knownDecimals = {
+  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": 6,
+  "0x6B175474E89094C44Da98b954EedeAC495271d0F": 18
+};
+
+let decimals;
+if (token in knownDecimals) {
+  decimals = knownDecimals[token];
+} else {
+  decimals = await tokenContract.decimals();
+}
+
+const balance = await tokenContract.balanceOf(userAddress);
+const formatted = ethers.utils.formatUnits(balance, decimals);
+
+const redeemAmount = Math.min(invested, parseFloat(formatted));
+
+  document.getElementById("redeemAmount").value = redeemAmount;
+
+}
+
+  window.addEventListener('load', init);
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eco Assets</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="features.css" />
+</head>
+<body>
+
+<!-- Fixed navigation bar -->
+<header class="navbar">
+  <div class="container">
+    <div class="navbar-logo">
+      <img src="logo.png" alt="Project Logo" class="logo">
+      <span class="project-name">BlacKnight</span>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="features.html">Features</a></li>  
+        <li><a href="female.html">Athena</a></li>
+        <li><a href="subscribe.html">Subscribe</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+  <style>
+  body {
+  margin: 0;
+  padding-top: 120px;
+  font-family: Arial, sans-serif;
+  background-image: url('luxury_background.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.eco-dashboard {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景，增强可读性 */
+  max-width: 1000px;
+  margin: 60px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.eco-table-wrapper {
+  overflow-x: auto;
+}
+
+#eco-table {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 900px;
+  border-collapse: collapse;
+}
+
+  #eco-table th, #eco-table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  #eco-table tbody tr:nth-child(odd) {
+    background-color: #E3F2FD; /* Light blue */
+  }
+
+  #eco-table tbody tr:nth-child(even) {
+    background-color: #BBDEFB; /* Slightly darker blue */
+  }
+
+  #eco-table thead {
+    background-color: #1565C0; /* Medium blue */
+    color: white;
+  }
+
+  #eco-table {
+    border: 1px solid #1565C0;
+  }
+
+  #eco-table td, #eco-table th {
+    border: 1px solid #90CAF9;
+    padding: 8px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #2E7D32;
+  }
+
+  p {
+    text-align: center;
+    font-style: italic;
+  }
+</style>
+
+</header>
+
+<h2 style="color: #2E7D32;">Real-Time Green / Eco Asset Dashboard</h2>
+<p>This panel displays selected eco-friendly assets with real-time market data to support sustainable investment decisions.</p>
+
+<table id="eco-table" border="1" cellpadding="8" style="width: 100%; max-width: 800px; border-collapse: collapse; font-family: Arial, sans-serif;">
+  <thead style="background-color: #388E3C; color: white;">
+    <tr>
+      <th>Asset Name</th>
+      <th>Price (USD)</th>
+      <th>Market Cap (M USD)</th>
+      <th>24h Change (%)</th>
+      <th>Annual Yield (APY)</th>
+      <th>Total Value Locked (TVL, M USD)</th>
+      <th>Green Tag</th>
+      <th>Official Website</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot>
+    <tr>
+      <td colspan="8" style="text-align: right; font-style: italic; font-size: 0.85em; padding-top: 10px;" id="last-updated">Last updated: --</td>
+    </tr>
+  </tfoot>
+</table>
+
+<script src="./ecoDataService.js"></script>
+
+<script>
+  async function renderEcoTable() {
+    const data = await getEcoAssets(); // getEcoAssets 是从 ecoDataService.js 普通方式加载的
+    const tbody = document.querySelector("#eco-table tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(asset => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${asset.name} (${asset.symbol})</td>
+        <td>$${asset.price.toFixed(2)}</td>
+        <td>$${(asset.marketCap / 1e6).toFixed(2)}</td>
+        <td style="color:${asset.change24h >= 0 ? '#2E7D32' : '#C62828'};">
+          ${asset.change24h.toFixed(2)}%
+        </td>
+        <td>${asset.apy ? asset.apy.toFixed(2) + '%' : 'N/A'}</td>
+        <td>${asset.tvl ? (asset.tvl / 1e6).toFixed(2) + 'M' : 'N/A'}</td>
+        <td>${asset.greenTag || 'Carbon Credit'}</td>
+        <td><a href="${asset.website}" target="_blank" rel="noopener" style="color:#1B5E20;">Visit</a></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById('last-updated').textContent =
+      'Last updated: ' + new Date().toLocaleString();
+  }
+
+  renderEcoTable();
+  setInterval(renderEcoTable, 30000);
+</script>
+

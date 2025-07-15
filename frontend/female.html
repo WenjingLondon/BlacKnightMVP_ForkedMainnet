@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Female-Friendly Investment Guide</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="features.css" />
+
+  <style>
+    body {
+      padding-top: 120px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+      color: #8E24AA;
+    }
+
+    #ai-section {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    #user-question {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+    }
+
+    #ai-response {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #444;
+    }
+
+    .token-card {
+      border: 1px solid #ccc;
+      margin: 15px auto;
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 800px;
+      background-color: #ffffff;
+    }
+
+    .token-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .token-card p {
+      margin: 5px 0;
+    }
+
+    /* Image grid styles */
+    #image-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      max-width: 800px;
+      margin: 40px auto;
+    }
+
+    .image-box img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .image-caption {
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
+  </head>
+
+<body>
+  <header class="navbar">
+  <div class="container">
+    <div class="navbar-logo">
+      <img src="logo.png" alt="Project Logo" class="logo">
+      <span class="project-name">BlacKnight</span>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="features.html">Features</a></li>         
+        <li><a href="ecopage.html">Eco Assets</a></li>
+        <li><a href="subscribe.html">Subscribe</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+  <h2>🌸 Female-Friendly Investment AI Assistant</h2>
+
+  <!-- AI Section -->
+  <div id="ai-section">
+    <input type="text" id="user-question" placeholder="Ask about best tokens, highest APY, strongest community..." />
+    <button id="ask-btn">Ask</button>  
+
+    <div id="ai-response"></div>
+  </div>
+
+  <!-- Token Display -->
+  <div id="token-list"></div>
+
+  <!-- Image Section -->
+
+  <style>
+  .image-caption {
+    background-color: pink; 
+    color: black;              
+    text-align: center;
+    padding: 8px;
+    font-size: 20px;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-weight: bold;
+  }
+</style>
+  <div id="image-grid">
+    <div class="image-box">
+      <img src="./female-pic1.jpg" alt="Green Project 1" />
+      <div class="image-caption">* DAO & Impact</div>
+    </div>
+    <div class="image-box">
+      <img src="./female-pic2.jpg" alt="Green Project 2" />
+      <div class="image-caption">* Green & ESG</div>
+    </div>
+    <div class="image-box">
+      <img src="./female-pic3.jpg" alt="Green Project 3" />
+      <div class="image-caption">* High Yield</div>
+    </div>
+    <div class="image-box">
+      <img src="./female-pic4.jpg" alt="Green Project 4" />
+      <div class="image-caption">* Real-World Assets</div>
+    </div>
+  </div>
+
+  <script type="module">
+  import { loadTokens, answerQuestion, getTokenSuggestions } from './data/womenAI.js';
+
+  let tokenData = [];
+
+  
+function renderTokens(tokens) {
+  const container = document.getElementById('token-list');
+  container.innerHTML = '';
+  tokens.forEach(token => {
+    const card = document.createElement('div');
+    card.className = 'token-card';
+    card.innerHTML = `
+      <h3>${token.name} (${token.symbol})</h3>
+      <p><strong>APY:</strong> ${token.apy}%</p>
+      <p><strong>LTV:</strong> ${token.ltv}%</p>
+      <p><strong>TVL:</strong> $${(token.tvl / 1e6).toFixed(1)}M</p>
+      <p><strong>Community Activity:</strong> ${token.communityActivityScore} / 10</p>
+      <p><strong>Governance Transparency:</strong> ${token.governanceTransparency} / 10</p>
+      <p><strong>Social Impact:</strong> ${token.socialImpactScore} / 10</p>
+      <p><a href="${token.website}" target="_blank">Website</a> | <a href="${token.twitter}" target="_blank">Twitter</a></p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+  
+async function init() {
+  tokenData = await loadTokens();
+  // 不渲染初始全部，可以留空或渲染全部token
+  // renderTokens(tokenData);
+}
+
+document.getElementById("ask-btn").addEventListener("click", () => {
+  const q = document.getElementById('user-question').value.trim();
+  if (!q) {
+    document.getElementById('ai-response').innerText = 'Please enter a question.';
+    document.getElementById('token-list').innerHTML = '';
+    return;
+  }
+  const results = getTokenSuggestions(q, tokenData);
+  const answer = answerQuestion(q, results);
+  document.getElementById('ai-response').innerText = answer;
+  renderTokens(results);
+});
+
+window.addEventListener('load', () => {
+  document.getElementById('ai-response').innerText = '';
+  document.getElementById('token-list').innerHTML = '';
+  document.getElementById('user-question').value = '';
+});
+
+init();
+
+  </script>
+
+</body>
+</html>
+
+
+

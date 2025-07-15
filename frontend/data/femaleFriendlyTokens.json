@@ -1,0 +1,48 @@
+
+[
+  {
+    "tokenId": "klima-dao",
+    "name": "KlimaDAO",
+    "symbol": "KLIMA",
+    "apy": 6.1,
+    "ltv": 65,
+    "tvl": 1500000,
+    "communityActivityScore": 8,
+    "governanceTransparency": 7,
+    "socialImpactScore": 9,
+    "tags": ["green", "carbon-credit", "DAO", "female-friendly"],
+    "description": "A decentralized carbon marketplace focused on reducing carbon footprint.",
+    "website": "https://www.klimadao.finance",
+    "twitter": "https://twitter.com/klimadao"
+  },
+  {
+    "tokenId": "toucan-protocol",
+    "name": "Toucan Protocol",
+    "symbol": "BCT",
+    "apy": 5.3,
+    "ltv": 60,
+    "tvl": 1200000,
+    "communityActivityScore": 7,
+    "governanceTransparency": 6,
+    "socialImpactScore": 8,
+    "tags": ["green", "carbon-credit", "female-friendly"],
+    "description": "Builds infrastructure for tokenized carbon credits on blockchain.",
+    "website": "https://toucan.earth",
+    "twitter": "https://twitter.com/ToucanProtocol"
+  },
+  {
+    "tokenId": "shefund",
+    "name": "SheFund",
+    "symbol": "SHF",
+    "apy": 7.0,
+    "ltv": 70,
+    "tvl": 500000,
+    "communityActivityScore": 9,
+    "governanceTransparency": 8,
+    "socialImpactScore": 10,
+    "tags": ["female-led", "community", "social-impact", "female-friendly"],
+    "description": "Investment fund empowering female entrepreneurs and social projects.",
+    "website": "https://shefund.example",
+    "twitter": "https://twitter.com/shefund"
+  }
+]
